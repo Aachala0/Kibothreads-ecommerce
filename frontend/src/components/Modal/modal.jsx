@@ -1,12 +1,23 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useContext } from "react";
 import KhaltiCheckout from "khalti-checkout-web";
 import config from "../Khalti/khaltiConfig";
+import { fireDB } from "../../firebase/FirebaseConfig";
+import { collection, addDoc } from "firebase/firestore";
+import Context from "../../context/data/context";
+import { toast } from "react-toastify";
 
 export default function Modal() {
   let checkout = new KhaltiCheckout(config);
 
   let [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+
+  const context = useContext(Context);
+  const { loading, setLoading } = context;
 
   function closeModal() {
     setIsOpen(false);
@@ -15,6 +26,33 @@ export default function Modal() {
   function openModal() {
     setIsOpen(true);
   }
+
+  const handleOrderNow = async () => {
+    setLoading(true);
+    const order = {
+      name,
+      address,
+      pincode,
+      mobileNumber,
+      orderDate: new Date(),
+      status: "Pending",
+    };
+
+    try {
+      await addDoc(collection(fireDB, "orders"), order);
+      toast.success("Order placed successfully");
+      setName("");
+      setAddress("");
+      setPincode("");
+      setMobileNumber("");
+      closeModal();
+    } catch (error) {
+      console.error("Error adding order: ", error);
+      toast.error("Failed to place order");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -70,6 +108,8 @@ export default function Modal() {
                                 type="name"
                                 name="name"
                                 id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
                                 className=" border outline-0 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-100"
                                 required
                               />
@@ -85,6 +125,8 @@ export default function Modal() {
                                 type="text"
                                 name="address"
                                 id="address"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
                                 className=" border outline-0 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-100"
                                 required
                               />
@@ -100,6 +142,8 @@ export default function Modal() {
                                 type="text"
                                 name="pincode"
                                 id="pincode"
+                                value={pincode}
+                                onChange={(e) => setPincode(e.target.value)}
                                 className=" border outline-0 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-100"
                                 required
                               />
@@ -115,13 +159,17 @@ export default function Modal() {
                                 type="text"
                                 name="mobileNumber"
                                 id="mobileNumber"
+                                value={mobileNumber}
+                                onChange={(e) =>
+                                  setMobileNumber(e.target.value)
+                                }
                                 className=" border outline-0 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-100"
                                 required
                               />
                             </div>
                           </form>
                           <button
-                            onClick={closeModal}
+                            onClick={(closeModal, handleOrderNow)}
                             type="button"
                             className="focus:outline-none w-full text-white bg-orange-400 bg-orange-400 hover:bg-orange-500  outline-0 font-medium rounded-lg text-sm px-5 py-2.5 "
                           >

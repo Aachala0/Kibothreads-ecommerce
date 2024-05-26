@@ -142,8 +142,7 @@ function State(props) {
       const result = await getDocs(collection(fireDB, "orders"));
       const ordersArray = [];
       result.forEach((doc) => {
-        ordersArray.push(doc.data());
-        setLoading(false);
+        usersArray.push({ ...doc.data(), id: doc.id });
       });
       setOrder(ordersArray);
       console.log(ordersArray);
@@ -176,6 +175,10 @@ function State(props) {
     }
   };
 
+  const [searchkey, setSearchkey] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterPrice, setFilterPrice] = useState("");
+
   useEffect(() => {
     getProductData();
     getOrderData();
@@ -198,6 +201,12 @@ function State(props) {
         deleteProduct,
         order,
         user,
+        searchkey,
+        setSearchkey,
+        filterCategory,
+        setFilterCategory,
+        filterPrice,
+        setFilterPrice,
       }}
     >
       {props.children}
