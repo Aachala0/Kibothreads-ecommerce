@@ -199,7 +199,7 @@ function DashboardTab() {
                                   <div>
                                     <Link
                                       to={"/updateproduct"}
-                                      onClick={edithandle(item)}
+                                      onClick={() => edithandle(item)}
                                     >
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
