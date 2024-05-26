@@ -1,9 +1,25 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Context from "../../../context/data/context";
 
 function AddProduct() {
   const context = useContext(Context);
   const { products, setProducts, addProduct } = context;
+
+  const [imageFile, setImageFile] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProducts({ ...products, imageUrl: reader.result });
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div>
       <div className=" flex justify-center bg-orange-400 items-center h-screen">
@@ -39,14 +55,10 @@ function AddProduct() {
           </div>
           <div>
             <input
-              onChange={(e) =>
-                setProducts({ ...products, imageUrl: e.target.value })
-              }
-              value={products.imageUrl}
-              type="text"
-              name="imageurl"
-              className=" bg-white border border-secondary mb-4 px-2 py-2 w-full rounded-lg text-black placeholder:text-muted outline-none"
-              placeholder="Product imageUrl"
+              onChange={handleImageChange}
+              type="file"
+              name="image"
+              className="bg-white border border-secondary mb-4 px-2 py-2 w-full rounded-lg text-black placeholder:text-muted outline-none"
             />
           </div>
           <div>
