@@ -1,0 +1,15 @@
+/******** installations *******/
+npm create vite@latest //to create the project
+
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+npm i react-router-dom
+npm i @headlessui/react
+npm i react-icons
+npm install react-toastify
+npm install react-redux
+npm install react-tabs
+npm install @reduxjs/toolkit react-redux
+npm install firebase
+npm install khalti-checkout-web
+ npm run dev
