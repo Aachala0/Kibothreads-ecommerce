@@ -161,7 +161,7 @@ function Cart() {
                 </p>
               </div>
             </div>
-            <Modal />
+            <Modal cart={cartItems} />
           </div>
         </div>
       </div>

@@ -34,7 +34,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="/order"
+                  href="/orders"
                   className="text-gray-600 hover:text-gray-800"
                   style={{ color: mode === "dark" ? "white" : "" }}
                 >

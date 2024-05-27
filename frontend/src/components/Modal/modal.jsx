@@ -7,7 +7,7 @@ import { collection, addDoc } from "firebase/firestore";
 import Context from "../../context/data/context";
 import { toast } from "react-toastify";
 
-export default function Modal() {
+export default function Modal({ cart }) {
   let checkout = new KhaltiCheckout(config);
 
   let [isOpen, setIsOpen] = useState(false);
@@ -26,9 +26,12 @@ export default function Modal() {
   function openModal() {
     setIsOpen(true);
   }
-
+  // Function to handle placing the order
   const handleOrderNow = async () => {
     setLoading(true);
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const userid =
+      currentUser && currentUser.user ? currentUser.user.uid : null;
     const order = {
       name,
       address,
@@ -36,16 +39,24 @@ export default function Modal() {
       mobileNumber,
       orderDate: new Date(),
       status: "Pending",
+      cartItems: cart, // Ensure that cart prop is used here
+      userid: userid,
     };
 
     try {
-      await addDoc(collection(fireDB, "orders"), order);
+      // Add the order to the orders collection
+      const orderRef = await addDoc(collection(fireDB, "orders"), order);
       toast.success("Order placed successfully");
+
+      // Clear the form fields and close the modal
       setName("");
       setAddress("");
       setPincode("");
       setMobileNumber("");
       closeModal();
+
+      // Log the order ID for reference
+      console.log("Order placed with ID: ", orderRef.id);
     } catch (error) {
       console.error("Error adding order: ", error);
       toast.error("Failed to place order");
@@ -53,7 +64,6 @@ export default function Modal() {
       setLoading(false);
     }
   };
-
   return (
     <>
       <div className="  text-center rounded-lg text-white font-bold">

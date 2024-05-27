@@ -27,7 +27,7 @@ function App() {
           <Route path="/Wishlist" element={<Wishlist />} />
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route
-            path="/order"
+            path="/orders"
             element={
               <ProtectedRoutes>
                 <Order />
