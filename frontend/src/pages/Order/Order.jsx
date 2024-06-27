@@ -4,27 +4,44 @@ import { getDocs, collection } from "firebase/firestore";
 import Context from "../../context/data/context";
 import Layout from "../../components/Layout/layout";
 import Loader from "../../components/Loader/loader";
-import { fireDB } from "../../firebase/FirebaseConfig"; // Make sure to import your Firestore configuration
+import { fireDB } from "../../firebase/FirebaseConfig";
 
 function Order() {
   const [order, setOrder] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  const userid = currentUser && currentUser.user ? currentUser.user.uid : null;
   const context = useContext(Context);
   const { mode } = context;
 
   useEffect(() => {
-    if (!currentUser) {
+    const currentUserString = localStorage.getItem("user"); // Make sure the key matches what is set during login
+    console.log("currentUserString from localStorage:", currentUserString);
+
+    if (!currentUserString) {
       console.error("No current user found in localStorage");
       navigate("/login"); // Redirect to login page using useNavigate
-    } else {
-      getOrderData();
+      return;
     }
-  }, []);
 
-  const getOrderData = async () => {
+    let currentUser;
+    try {
+      currentUser = JSON.parse(currentUserString);
+    } catch (error) {
+      console.error("Error parsing currentUser from localStorage:", error);
+      navigate("/login");
+      return;
+    }
+
+    if (!currentUser || !currentUser.user || !currentUser.user.uid) {
+      console.error("Invalid currentUser structure:", currentUser);
+      navigate("/login");
+      return;
+    }
+
+    getOrderData(currentUser.user.uid);
+  }, [navigate]);
+
+  const getOrderData = async (userid) => {
     setLoading(true);
     try {
       const result = await getDocs(collection(fireDB, "orders"));
@@ -33,25 +50,24 @@ function Order() {
         ordersArray.push({ ...doc.data(), id: doc.id });
       });
       setOrder(ordersArray);
-      console.log(ordersArray);
-      setLoading(false);
+      console.log("Fetched orders:", ordersArray);
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching orders:", error);
+    } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    console.log("Fetched orders:", order); // Log fetched orders
-  }, [order]);
-
   return (
     <Layout>
       {loading && <Loader />}
-      {!loading && order && order.length > 0 ? (
+      {!loading && order.length > 0 ? (
         <div className="h-full pt-10">
           {order
-            .filter((obj) => obj.userid === userid)
+            .filter(
+              (obj) =>
+                obj.userid === JSON.parse(localStorage.getItem("user")).user.uid
+            )
             .map((order) => (
               <div
                 key={order.id}
@@ -107,7 +123,12 @@ function Order() {
         </div>
       ) : (
         !loading && (
-          <h2 className="text-center text-2xl text-white">No Orders</h2>
+          <h2
+            className="text-center text-2xl"
+            style={{ color: mode === "dark" ? "white" : "black" }}
+          >
+            No Orders
+          </h2>
         )
       )}
     </Layout>
