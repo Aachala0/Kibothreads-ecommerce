@@ -12,19 +12,18 @@ function Cart() {
 
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart);
-  // console.log(cartItems)
 
   const [totalAmount, setTotalAmount] = useState(0);
+
   useEffect(() => {
     let temp = 0;
     cartItems.forEach((cartItem) => {
       temp = temp + parseInt(cartItem.price);
     });
     setTotalAmount(temp);
-    // console.log(temp)
   }, [cartItems]);
 
-  const shipping = parseInt(100);
+  const shipping = 100;
   const grandTotal = shipping + totalAmount;
 
   // delete from cart
@@ -40,23 +39,24 @@ function Cart() {
   return (
     <Layout>
       <div
-        className="h-screen bg-gray-100 pt-5 "
+        className="h-screen bg-gray-100 pt-5"
         style={{
           backgroundColor: mode === "dark" ? "#282c34" : "",
           color: mode === "dark" ? "white" : "",
         }}
       >
         <h1 className="mb-10 text-center text-2xl font-bold">Cart Items</h1>
-        <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0 ">
-          <div className="rounded-lg md:w-2/3 ">
+        <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0">
+          <div className="rounded-lg md:w-2/3">
             {cartItems.map((item, index) => {
               return (
                 <div
-                  className="justify-between mb-6 rounded-lg border  drop-shadow-xl bg-white p-6  sm:flex  sm:justify-start"
+                  className="justify-between mb-6 rounded-lg border drop-shadow-xl bg-white p-6 sm:flex sm:justify-start"
                   style={{
                     backgroundColor: mode === "dark" ? "rgb(32 33 34)" : "",
                     color: mode === "dark" ? "white" : "",
                   }}
+                  key={index}
                 >
                   <img
                     src={item.imageUrl}
@@ -72,7 +72,7 @@ function Cart() {
                         {item.title}
                       </h2>
                       <h2
-                        className="text-sm  text-gray-900"
+                        className="text-sm text-gray-900"
                         style={{ color: mode === "dark" ? "white" : "" }}
                       >
                         {item.description}
@@ -152,7 +152,7 @@ function Cart() {
               >
                 Total
               </p>
-              <div className>
+              <div>
                 <p
                   className="mb-1 text-lg font-bold"
                   style={{ color: mode === "dark" ? "white" : "" }}
@@ -161,7 +161,7 @@ function Cart() {
                 </p>
               </div>
             </div>
-            <Modal cart={cartItems} />
+            <Modal cart={cartItems} grandTotal={grandTotal} />
           </div>
         </div>
       </div>
