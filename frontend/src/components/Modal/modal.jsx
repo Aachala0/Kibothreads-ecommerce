@@ -1,15 +1,15 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { useEffect } from "react";
 import { Fragment, useState, useContext } from "react";
-import KhaltiCheckout from "khalti-checkout-web";
-import config from "../Khalti/khaltiConfig";
 import { fireDB } from "../../firebase/FirebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import Context from "../../context/data/context";
 import { toast } from "react-toastify";
+import { ESEWA_TEST_PID, ESEWA_URL, ESEWA_SCD } from "../Esewa/esewa";
+
+let form = null;
 
 export default function Modal({ cart }) {
-  let checkout = new KhaltiCheckout(config);
-
   let [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -64,6 +64,43 @@ export default function Modal({ cart }) {
       setLoading(false);
     }
   };
+
+  const [params, setParams] = useState({
+    amt: 100,
+    psc: 0,
+    pdc: 0,
+    txAmt: 0,
+    tAmt: 100,
+    pid: ESEWA_TEST_PID,
+    scd: ESEWA_SCD,
+    su: "https://d2evy.csb.app/success",
+    fu: "https://d2evy.csb.app/failed",
+  });
+
+  useEffect(() => {
+    post();
+  });
+
+  const post = () => {
+    form = document.createElement("form");
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", ESEWA_URL);
+
+    for (var key in params) {
+      var hiddenField = document.createElement("input");
+      hiddenField.setAttribute("type", "hidden");
+      hiddenField.setAttribute("name", key);
+      hiddenField.setAttribute("value", params[key]);
+      form.appendChild(hiddenField);
+    }
+
+    document.body.appendChild(form);
+    // form.submit();
+  };
+  const handleSubmit = () => {
+    form.submit();
+  };
+
   return (
     <>
       <div className="  text-center rounded-lg text-white font-bold">
@@ -185,12 +222,13 @@ export default function Modal({ cart }) {
                           >
                             Order Now
                           </button>
+
                           <button
-                            onClick={() => checkout.show({ amount: 10000 })}
+                            onClick={handleSubmit}
                             type="button"
-                            className="focus:outline-none w-full text-white bg-violet-900 hover:bg-violet-950  outline-0 font-medium rounded-lg text-sm px-5 py-2.5 "
+                            className="focus:outline-none w-full text-white bg-lime-600 hover:bg-lime-700  outline-0 font-medium rounded-lg text-sm px-5 py-2.5 "
                           >
-                            Pay Via Khalti
+                            Pay Via Esewa
                           </button>
                         </div>
                       </div>
